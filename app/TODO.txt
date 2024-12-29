@@ -1,0 +1,31 @@
+TODO: {
+
+    1. Middleware de auth
+
+    2. Proteccion de rutas
+
+    3. Paginacion
+
+    4. Model de categorias
+
+    5. Controller de categorias
+
+    6. Field de categoria (foreign key) en productos
+
+    7. Field de creds en usuarios admin
+
+    8. Filtro en controller de productos
+
+    9. Filtro en controller de usuarios
+
+    10. Service de telegram
+
+    11. Firebase para archivos 
+
+    12. pg instance
+
+    13. Merchant ID en todas las tablas
+
+    14. arquitectura de subdominios / query param de merchant ID para manejar multi tenancy como arquitectura
+
+}
