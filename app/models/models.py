@@ -7,6 +7,7 @@ from ..config.database_config import engine
 from ..schemas.user import UserCreateDTO
 from ..schemas.card import CardCreateDTO
 from ..schemas.product import ProductCreateDTO
+from ..schemas.shop import ShopCreateDTO
 
 class RoleEnum(Enum):
     user = "user"
@@ -15,10 +16,32 @@ class RoleEnum(Enum):
 class Base(DeclarativeBase):
     pass
 
+class Shop(Base):
+    __tablename__ = "shops"
+    
+    id: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str] = mapped_column()
+    telegram_id: Mapped[str] = mapped_column(nullable=False)
+    deleted: Mapped[bool] = mapped_column(default=False)
+    users = relationship("User", back_populates="shop")
+    products = relationship("Product", back_populates="shop")
+    
+    def to_json(self):
+        return {
+            "id": self.id,
+            "telegram_id": self.telegram_id
+        }
+        
+    def __init__(self, body:ShopCreateDTO):
+        self.name = body.name
+        self.telegram_id = body.telegram_id
+
 class User(Base):
     __tablename__ = "users"
 
     id: Mapped[int] = mapped_column(primary_key=True)
+    shop_id: Mapped[int] = mapped_column(ForeignKey("shops.id"))
+    shop = relationship("Shop", back_populates="users")
     name: Mapped[str] = mapped_column(nullable=False)
     last_name: Mapped[str] = mapped_column(nullable=False)
     phone: Mapped[str] = mapped_column()
@@ -77,6 +100,8 @@ class Product(Base):
     __tablename__ = "products"
     
     id: Mapped[int] = mapped_column(primary_key=True)
+    shop = relationship("Shop", back_populates="product")
+    shop_id = mapped_column(ForeignKey("shops.id"))
     name: Mapped[str] = mapped_column(nullable=False, unique=True)
     description: Mapped[str] = mapped_column( nullable=False)
     price: Mapped[float] = mapped_column(default=0.00)

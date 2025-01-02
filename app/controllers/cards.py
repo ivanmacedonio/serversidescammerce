@@ -41,7 +41,7 @@ async def create_card(body:CardCreateDTO, db: Session = Depends(get_db)):
         db.commit()
         db.refresh(card_instance)
         
-        return make_response("Card created successfully", 200)
+        return make_response("Card created successfully", 201)
     except SQLAlchemyError as e:
         return make_response(str(e), 400, "/cards POST")
     
