@@ -16,7 +16,7 @@ async def get_products(request:Request,
     try:
         shop_id = request.headers.get("Shop-Id")
         filter_name = request.query_params.get("name", None)
-        query = db.query(Product).filter(Product.deleted == False, Product.shop_id == shop_id)
+        query = db.query(Product).filter(Product.deleted == False)
         if filter_name:
             query.filter(Product.name.ilike(f"%{filter_name}%"))
         response = query.order_by(Product.created_at).offset(skip).limit(limit).all()
@@ -29,7 +29,7 @@ async def get_product_by_id(request:Request, product_id:int, db: Session = Depen
     if not id: abort(400, "Product ID is required")
     try:
         shop_id = request.headers.get("Shop-Id")
-        response = db.query(Product).filter(Product.id == product_id, Product.shop_id == shop_id).first()
+        response = db.query(Product).filter(Product.id == product_id).first()
         return make_response(response.to_json(), 200)
     except SQLAlchemyError as e:
         return make_response(str(e), 500, "/products/{product_id} GET")
@@ -58,7 +58,7 @@ async def create_product(request:Request, body:ProductCreateDTO, db: Session = D
 async def update_product(request:Request, product_id:int, body:ProductUpdateDTO, db: Session = Depends(get_db)):
     if not product_id: abort(400, "Product ID is required")
     shop_id = request.headers.get("Shop-Id")
-    product_q = db.query(Product).filter(Product.id == product_id, Product.shop_id == shop_id).first()
+    product_q = db.query(Product).filter(Product.id == product_id).first()
     if not product_q: abort(404, f"Product with ID {product_id} not found")
     category_q = db.query(Category).filter(Category.id == body.category_id).first()
     if not category_q: abort(404, f'Category with ID {body.category_id} not found!')
@@ -81,7 +81,7 @@ async def delete_product(request:Request, product_id:int, db:Session = Depends(g
     if not product_id: abort(400, "Product ID is required")
     try:
         shop_id = request.headers.get("Shop-Id")
-        product_q = db.query(Product).filter(Product.id == product_id, Product.shop_id == shop_id).first()
+        product_q = db.query(Product).filter(Product.id == product_id).first()
         if not product_q: abort(404, f"Product with ID {product_q} not exists")
         db.query(Product).filter(Product.id == product_id).update({
             "deleted": True

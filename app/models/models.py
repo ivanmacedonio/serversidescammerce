@@ -30,8 +30,8 @@ class Shop(Base):
     users = relationship("User", back_populates="shop")
     products = relationship("Product", back_populates="shop")
     categories = relationship("Category", back_populates="shop")
-    banner_image = Mapped[str] = mapped_column(nullable=False)
-    banner_title = Mapped[str] = mapped_column(nullable=False)
+    banner_image: Mapped[str] = mapped_column(nullable=False)
+    banner_title: Mapped[str] = mapped_column(nullable=False)
     
     def to_json(self):
         return {
@@ -138,6 +138,7 @@ class Product(Base):
         self.discount = body.discount
         self.category_id = body.category_id
         self.shop_id = shop_id
+        self.image_url = body.image_url
     
     def to_json(self):
         return {

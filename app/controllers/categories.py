@@ -12,7 +12,7 @@ router = APIRouter()
 async def get_categories(request:Request ,db: Session = Depends(get_db)):
     try:
         shop_id = request.headers.get("Shop-Id")
-        categories_q = db.query(Category).filter(Category.deleted == False, Category.shop_id == shop_id)
+        categories_q = db.query(Category).filter(Category.deleted == False)
         return make_response([category.to_json() for category in categories_q], 200)
     except SQLAlchemyError as e:
         return make_response(str(e), 500, "/categories GET")
@@ -22,7 +22,7 @@ async def get_category_by_id(request:Request, category_id:int, db:Session = Depe
     if not category_id: abort(400, "Category ID is required")
     try:
         shop_id = request.headers.get("Shop-Id")
-        category_q = db.query(Category).filter(Category.id == category_id, Category.shop_id == shop_id).first()
+        category_q = db.query(Category).filter(Category.id == category_id).first()
         if not category_q: abort(404, f"Category with ID {category_id} not found!")
         return make_response(category_q.to_json(), 200)
     except SQLAlchemyError as e:
@@ -48,7 +48,7 @@ async def create_category(request:Request ,body:CategorySchema, db:Session = Dep
 async def update_category(request:Request, category_id:int, body:CategorySchema, db:Session = Depends(get_db)):
     try:
         shop_id = request.headers.get("Shop-Id")
-        category_instance = db.query(Category).filter(Category.id == category_id, Category.shop_id == shop_id).first()
+        category_instance = db.query(Category).filter(Category.id == category_id).first()
         if not category_instance: abort(404, f"Category with ID {category_id} not found!")
         db.query(Category).filter(Category.id == category_id).update({
             "name": body.name
@@ -62,7 +62,7 @@ async def update_category(request:Request, category_id:int, body:CategorySchema,
 async def delete_category(request:Request, category_id:int, db:Session = Depends(get_db)):
     try:
         shop_id = request.headers.get("Shop-Id")
-        category_instance = db.query(Category).filter(Category.id == category_id, Category.shop_id == shop_id).first()
+        category_instance = db.query(Category).filter(Category.id == category_id).first()
         if not category_instance: abort(404, f"Category with ID {category_id} not found!")
         db.query(Category).filter(Category.id == category_id).update({
             "deleted": True

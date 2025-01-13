@@ -17,7 +17,7 @@ async def get_users(request:Request,
     try:
         shop_id = request.headers.get("Shop-Id")
         filter_name = request.query_params.get("name", None)
-        base_query = db.query(User).filter(User.deleted == False, User.shop_id ==  shop_id)
+        base_query = db.query(User).filter(User.deleted == False, User.shop_id == shop_id)
         if filter_name:
             base_query.filter(User.name.ilike(f"%{filter_name}%"))
         response = base_query.order_by(User.created_at).offset(skip).limit(limit).all()

