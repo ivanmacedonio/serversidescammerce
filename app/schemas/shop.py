@@ -4,7 +4,9 @@ from typing import Optional
 class ShopSchema(BaseModel):
     name:str
     telegram_id:str
-    deleted:Optional[bool]
+    deleted:Optional[bool] = False
+    banner_image:str
+    banner_title:str
     
     class Config:
         orm_mode = True
