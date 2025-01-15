@@ -15,15 +15,16 @@ async def verify_is_request_authenticated(request:Request, call_next):
     except Exception as e:
         return make_response(str(e), 500, "verify_is_request_authenticated")
     
-async def verify_shop_id(request:Request, call_next):
-    SAVE_ROUTES = ["/shops", "/products", "/categories"]
-    if any(request.url.path.startswith(route) for route in SAVE_ROUTES):
-        response = await call_next(request)
-        return response
-    try:
-        shop_id = request.headers.get('Shop-Id', None)
-        if not shop_id: abort(400, "Shop ID is required")
-        response = await call_next(request)
-        return response
-    except Exception as e:
-        return make_response(str(e), 500, "verify_shop_id")
+# async def verify_shop_id(request:Request, call_next):
+#     SAVE_ROUTES = ["/shops", "/products", "/categories"]
+#     if any(request.url.path.startswith(route) for route in SAVE_ROUTES):
+#         response = await call_next(request)
+#         return response
+#     try:
+#         shop_id = request.headers.get('Shop-Id', None)
+#         print(f'SHOPID: {shop_id}')
+#         if not shop_id: abort(400, "Shop ID is required")
+#         response = await call_next(request)
+#         return response
+#     except Exception as e:
+#         return make_response(str(e), 500, "verify_shop_id")
