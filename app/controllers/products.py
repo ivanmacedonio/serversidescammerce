@@ -29,8 +29,9 @@ async def get_product_by_id(request:Request, product_id:int, db: Session = Depen
     if not id: abort(400, "Product ID is required")
     try:
         shop_id = request.headers.get("Shop-Id")
-        response = db.query(Product).filter(Product.id == product_id).first()
-        return make_response(response.to_json(), 200)
+        product_q = db.query(Product).filter(Product.id == product_id).first()
+        if not product_q: abort(404, f"Product with ID {product_id} not found")
+        return make_response(product_q.to_json(), 200)
     except SQLAlchemyError as e:
         return make_response(str(e), 500, "/products/{product_id} GET")
         
@@ -40,6 +41,7 @@ async def create_product(request:Request, body:ProductCreateDTO, db: Session = D
     if not shop_id: abort(400, "Shop ID is required")
     shop_q = db.query(Shop).filter(Shop.id == shop_id).first()
     if not shop_q: abort(404, f"Shop with ID {shop_id} not found!")
+    
     product_q = db.query(Product).filter(Product.name == body.name).first()
     category_q = db.query(Category).filter(Category.id == body.category_id).first()
     

@@ -149,7 +149,9 @@ class Product(Base):
             "discount": float(self.discount),
             "deleted": self.deleted,
             "shop_id": self.shop_id,
-            "category_id": self.category_id
+            "category_id": self.category_id,
+            "image_url": self.image_url,
+            "description": self.description
         }
         
 class Category(Base):

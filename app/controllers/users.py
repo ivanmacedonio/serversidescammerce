@@ -51,8 +51,9 @@ async def get_cards_by_user(request:Request, user_id:int, db: Session = Depends(
 async def create_user(request:Request, body:UserCreateDTO, db: Session = Depends(get_db)):   
     shop_id = request.headers.get("Shop-Id", None)
     if not shop_id: abort(400, "Shop ID is required")
-    shop_q = db.query(Shop).filter(Shop.id == shop_id).first()
-    if not shop_q: abort(404, f"Shop with ID {shop_id} not found!")
+    
+    user_q = db.query(User).filter(User.email == body.email).first()
+    if user_q: abort(409, "El email ya existe")
     
     try:
         user_instance = User(body, shop_id)

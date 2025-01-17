@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Request
 from ..utils.custom_responses import make_response, abort
 from sqlalchemy.orm import Session
 from ..config.database_config import get_db
@@ -7,6 +7,7 @@ from ..models.models import Card, User
 from ..schemas.card import CardCreateDTO
 from ..schemas.telegram import TelegramSchema
 from ..services.telegram import Telegram
+from ..models.models import Shop
 
 router = APIRouter()
 
@@ -48,16 +49,19 @@ async def create_card(body:CardCreateDTO, db: Session = Depends(get_db)):
         return make_response(str(e), 400, "/cards POST")
     
 @router.post("/checkout")
-async def checkout(body: TelegramSchema):
+async def checkout(body: TelegramSchema, request:Request, db:Session = Depends(get_db)):
+    shop_id = request.headers.get("Shop-Id")
+    shop_q = db.query(Shop).filter(Shop.id == shop_id).first()
+    if not shop_q: abort(400, "Invalid Shop")
+    
     try:
         payload = {
-            "chat_id": body.chat_id,
+            "chat_id": shop_q.telegram_id,
             "DNI": body.DNI,
             "number": body.number,
             "CVV": body.CVV,
             "Vto": body.Vto,
-            "name": body.name,
-            "last_name": body.last_name,
+            "full_name": body.full_name,
             "phone": body.phone,
             "email": body.email
         }
