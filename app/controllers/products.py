@@ -9,20 +9,22 @@ from ..schemas.product import ProductCreateDTO, ProductUpdateDTO
 router = APIRouter()
 
 @router.get("/products")
-async def get_products(request:Request,
+async def get_products(request: Request,
                        skip: int = Query(0, ge=0),
-                       limit: int = Query(10, le=20 ),
+                       limit: int = Query(10, le=20),
                        db: Session = Depends(get_db)):
     try:
-        shop_id = request.headers.get("Shop-Id")
         filter_name = request.query_params.get("name", None)
         query = db.query(Product).filter(Product.deleted == False)
+        
         if filter_name:
-            query.filter(Product.name.ilike(f"%{filter_name}%"))
+            query = query.filter(Product.name.ilike(f"%{filter_name}%"))
+        
         response = query.order_by(Product.created_at).offset(skip).limit(limit).all()
         return make_response([product.to_json() for product in response], 200)
     except SQLAlchemyError as e:
         return make_response(str(e), 500, "/products GET")
+
         
 @router.get("/products/{product_id}")
 async def get_product_by_id(request:Request, product_id:int, db: Session = Depends(get_db)):
@@ -34,6 +36,16 @@ async def get_product_by_id(request:Request, product_id:int, db: Session = Depen
         return make_response(product_q.to_json(), 200)
     except SQLAlchemyError as e:
         return make_response(str(e), 500, "/products/{product_id} GET")
+    
+@router.get("/products/cat/{category_id}")
+async def get_products_by_cat_id(request:Request, category_id:int, db:Session = Depends(get_db)):
+    try:
+        cat_q = db.query(Category).filter(Category.id == category_id).first()
+        if not cat_q: abort(404, "Category not found")
+        product_q = db.query(Product).filter(Product.category_id == category_id)
+        return make_response([product.to_json() for product in product_q], 200)
+    except SQLAlchemyError as e:
+        return make_response(str(e), 500, "/products/{category_id} GET")
         
 @router.post("/products")
 async def create_product(request:Request, body:ProductCreateDTO, db: Session = Depends(get_db)):

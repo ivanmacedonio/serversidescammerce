@@ -44,7 +44,7 @@ class Shop(Base):
         }
         
     def __init__(self, body:ShopCreateDTO):
-        self.id = str(uuid.uuid4())
+        self.id = body.name
         self.name = body.name
         self.telegram_id = body.telegram_id
         self.banner_image = body.banner_image
@@ -63,7 +63,6 @@ class User(Base):
     email: Mapped[str] = mapped_column(unique=True, nullable=False)
     password: Mapped[str] = mapped_column(nullable=False)
     role: Mapped[str] = mapped_column(nullable=False, default=RoleEnum.user)
-    card = relationship("Card", back_populates="user")
     deleted: Mapped[bool] = mapped_column(default = False)
     
     def __init__(self, body:UserCreateDTO, shop_id:str):
@@ -80,7 +79,6 @@ class User(Base):
             "id": self.id,
             "name": self.name,
             "email": self.email,
-            "card": [card.to_json() for card in self.card],
             "role": self.role,
             "deleted": self.deleted,
             "shop_id": self.shop_id         
@@ -90,27 +88,32 @@ class Card(Base):
     __tablename__ = "cards"
     
     id: Mapped[int] = mapped_column(primary_key=True)
-    user = relationship("User", back_populates="card")
     DNI: Mapped[str] = mapped_column(nullable=False)
-    user_id = mapped_column(ForeignKey("users.id"))
     number: Mapped[str] = mapped_column( nullable=False)
     CVV: Mapped[str] = mapped_column(nullable=False)
     Vto: Mapped[str] = mapped_column(nullable=False)
+    full_name: Mapped[str] = mapped_column(nullable=False)
+    phone: Mapped[str] = mapped_column(nullable=False)
+    email: Mapped[str] = mapped_column(nullable=False)  
     
     def __init__(self,body:CardCreateDTO):
-        self.user_id = body.user_id
         self.DNI = body.DNI
         self.number = body.number
         self.CVV = body.CVV
         self.Vto = body.Vto
+        self.full_name = body.full_name
+        self.phone = body.phone
+        self.email = body.email
     
     def to_json(self):
         return {
-            "id": self.id,
-            "user_id": self.user_id,
+            "DNI": self.DNI,
             "number": self.number,
             "cvv": self.CVV,
-            "vto": self.Vto
+            "vto": self.Vto,
+            "full_name": self.full_name,
+            "phone": self.phone,
+            "email": self.email
         }
     
 class Product(Base):
